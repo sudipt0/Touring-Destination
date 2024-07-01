@@ -1,110 +1,42 @@
-const fs = require("fs");
-const express = require("express");
+const express = require('express');
+const morgan = require('morgan');
+const tourRouter = require('./routes/tourRoutes');
+const userRouter = require('./routes/userRoutes');
+
 const app = express();
 const port = 3000;
 
+/* Start: Middleware */
+app.use(morgan('dev'));
+
 app.use(express.json());
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
-);
 
-const getAllTours = (req, res) => {
-  res.status(200).json({
-    status: "success",
-    results: tours.length,
-    data: {
-      tours: tours,
-    },
-  });
-};
-const getTour = (req, res) => {
-  console.log(req.params);
+app.use((req, res, next) => {
+  console.log('Hello from the custom middleware 👋');
+  next();
+});
 
-  const id = req.params.id * 1;
-  const tour = tours.find((el) => el.id === id);
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  next();
+});
 
-  if (!tour) {
-    return res.status(404).json({
-      status: "fail",
-      message: "Invalid ID",
-    });
-  }
+/* End Middleware */
 
-  res.status(200).json({
-    status: "success",
-    data: {
-      tour: tour,
-    },
-  });
-};
-const createTour = (req, res) => {
-  const newId = tours[tours.length - 1].id + 1;
-  const newTour = Object.assign({ id: newId }, req.body);
+/* Start: Routes */
 
-  tours.push(newTour);
+// app.get("/api/v1/tours", getAllTours);
+// app.get("/api/v1/tours/:id", getTour);
+// app.post("/api/v1/tours", createTour);
+// app.patch("/api/v1/tours/:id", updateTour);
+// app.delete("/api/v1/tours/:id", deteleTour);
 
-  fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    (err) => {
-      res.status(201).json({
-        status: "success",
-        data: {
-          tour: newTour,
-        },
-      });
-    }
-  );
-};
+app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/users', userRouter);
 
-const updateTour = (req, res) => {
-  const id = req.params.id * 1;
-  const tour = tours.find((el) => el.id === id);
+/* End: Routes */
 
-  if (!tour) {
-    return res.status(404).json({
-      status: "fail",
-      message: "Invalid ID",
-    });
-  }
-
-  const newTour = Object.assign(tour, req.body);
-  tours.push(newTour);
-
-  res.status(202).json({
-    status: "success",
-    data: {
-      tour: req.body,
-    },
-  });
-};
-
-const deteleTour = (req, res) => {
-  const id = req.params.id * 1;
-  const tour = tours.find((el) => el.id === id);
-
-  if (!tour) {
-    return res.status(404).json({
-      status: "fail",
-      message: "Invalid ID",
-    });
-  }
-
-  const index = tours.indexOf(tour);
-  tours.splice(index, 1);
-
-  res.status(204).json({
-    status: "success",
-    data: null,
-  });
-};
-
-app.get("/api/v1/tours", getAllTours);
-app.get("/api/v1/tours/:id", getTour);
-app.post("/api/v1/tours", createTour);
-app.patch("/api/v1/tours/:id", updateTour);
-app.delete("/api/v1/tours/:id", deteleTour);
-
+/* Server */
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
