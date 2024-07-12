@@ -45,7 +45,7 @@ class APIFeature {
       // console.log(fields);
       this.query = this.query.select(fields);
     } else {
-      this.query = this.query.select('-__v');
+      this.query = this.query.select('-__v'); // exclude __v field by using -
     }
 
     return this;

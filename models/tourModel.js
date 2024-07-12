@@ -1,4 +1,3 @@
-const e = require('express');
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 
