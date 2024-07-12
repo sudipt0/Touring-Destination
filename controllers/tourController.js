@@ -1,6 +1,7 @@
 const Tour = require('../models/tourModel');
 const APIFeature = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
 
 /* Middleware export */
 
@@ -32,10 +33,11 @@ exports.getTour = catchAsync(async (req, res, next) => {
   const tour = await features.query;
 
   if (!tour) {
-    return res.status(404).json({
+    return next(new AppError('No tour found with that ID', 404));
+    /* return res.status(404).json({
       status: 'fail',
       message: 'Invalid ID',
-    });
+    }); */
   }
   res.status(200).json({
     status: 'success',
@@ -63,10 +65,11 @@ exports.updateTour = catchAsync(async (req, res, next) => {
   });
 
   if (!tour) {
-    return res.status(404).json({
+    return next(new AppError('No tour found with that ID', 404));
+    /* return res.status(404).json({
       status: 'fail',
       message: 'Invalid ID',
-    });
+    }); */
   }
   res.status(202).json({
     status: 'success',
@@ -79,10 +82,11 @@ exports.updateTour = catchAsync(async (req, res, next) => {
 exports.deteleTour = catchAsync(async (req, res, next) => {
   const tour = await Tour.findByIdAndDelete(req.params.id);
   if (!tour) {
-    return res.status(404).json({
+    return next(new AppError('No tour found with that ID', 404));
+    /* return res.status(404).json({
       status: 'fail',
       message: 'Invalid ID',
-    });
+    }); */
   }
   res.status(204).json({
     status: 'success',
