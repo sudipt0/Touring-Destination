@@ -1,6 +1,8 @@
 const express = require('express');
 const tourController = require('../controllers/tourController');
 const authController = require('../controllers/authController');
+// const reviewController = require('../controllers/reviewController');
+const reviewRouter = require('./reviewRoutes');
 
 const router = express.Router();
 
@@ -9,12 +11,35 @@ const router = express.Router();
 
 /* End: Middleware */
 
+// POST /tours/234fad4/reviews
+// GET /tours/234fad4/reviews
+// GET /tours/234fad4/reviews/948fad8
+
+/* router
+  .route('/:tourId/reviews')
+  .get(reviewController.getAllReviews)
+  .post(
+    authController.protect,
+    authController.restrictTo('user'),
+    reviewController.createReview,
+  ); */
+
+// Nested Routes
+
+router.use('/:tourId/reviews', reviewRouter);
+
 router.route('/tour-stats').get(tourController.getTourStats);
-router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
+router
+  .route('/monthly-plan/:year')
+  .get(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide', 'guide'),
+    tourController.getMonthlyPlan,
+  );
 
 router
   .route('/')
-  .get(authController.protect, tourController.getAllTours) // middleware used to validate JWT token (authController.protect)
+  .get(tourController.getAllTours) // middleware used to validate JWT token (authController.protect)
   // .post(tourController.checkBody, tourController.createTour);
   .post(
     authController.protect,
@@ -23,7 +48,7 @@ router
   );
 router
   .route('/:id')
-  .get(authController.protect, tourController.getTour)
+  .get(tourController.getTour)
   .patch(
     authController.protect,
     authController.restrictTo('admin', 'lead-guide', 'guide'),
@@ -32,7 +57,7 @@ router
   .delete(
     authController.protect,
     authController.restrictTo('admin', 'lead-guide'),
-    tourController.deteleTour,
+    tourController.deleteTour,
   );
 
 module.exports = router;
