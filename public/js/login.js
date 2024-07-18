@@ -11,7 +11,6 @@ const login = async (email, password) => {
         password,
       },
     });
-    console.log(res);
     if (res.data.status === 'success') {
       alert('Logged in successfully!');
       window.setTimeout(() => {
@@ -19,7 +18,7 @@ const login = async (email, password) => {
       }, 1500);
     }
   } catch (err) {
-    alert(err);
+    alert(err.response.data.message);
   }
 };
 
