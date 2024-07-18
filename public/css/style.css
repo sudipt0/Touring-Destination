@@ -349,6 +349,7 @@ body {
     100% calc(100% - var(--section-rotate)),
     0 100%
   );
+  background: linear-gradient(to right bottom, #9cf58f, #28b487);
 }
 
 .header__hero {
@@ -672,7 +673,7 @@ body {
   fill: #55c57a;
 }
 .reviews__star--inactive {
-  fill: #bbb;
+  fill: #f9e0e0;
 }
 
 .section-cta {
@@ -830,6 +831,7 @@ body {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  justify-content: flex-end;
 }
 .footer__nav li {
   margin-left: 1.5rem;

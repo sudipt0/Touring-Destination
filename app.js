@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
@@ -11,8 +12,20 @@ const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const viewRouter = require('./routes/viewRoutes');
 
 const app = express();
+
+// Set view engine
+app.set('view engine', 'pug');
+
+// app.set('views', `${__dirname}/views`);
+// alernate way to set views path using path module (path is inbuilt module in nodejs)
+app.set('views', path.join(__dirname, 'views'));
+
+// Serving static files
+// app.use(express.static(`${__dirname}/public`));
+app.use(express.static(path.join(__dirname, 'public')));
 
 /* Start: Global Middleware */
 
@@ -57,9 +70,6 @@ app.use(
   }),
 );
 
-// Serving static files
-app.use(express.static(`${__dirname}/public`));
-
 /* app.use((req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
     console.log('Hello from the custom middleware 👋');
@@ -84,6 +94,9 @@ app.use((req, res, next) => {
 // app.patch("/api/v1/tours/:id", updateTour);
 // app.delete("/api/v1/tours/:id", deteleTour);
 
+/* Web routes */
+app.use('/', viewRouter);
+/* API routes */
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
