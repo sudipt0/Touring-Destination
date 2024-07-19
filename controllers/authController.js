@@ -85,7 +85,16 @@ exports.login = catchAsync(async (req, res, next) => {
     token: token,
   }); */
 });
-
+/* Logout */
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000), // 10 sec
+    httpOnly: true,
+  });
+  res.status(200).json({
+    status: 'success',
+  });
+};
 /* Middleware to check JWT token */
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) Getting token and check if it's there
