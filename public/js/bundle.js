@@ -13139,11 +13139,14 @@ exports.showAlert = showAlert;
 require("@babel/polyfill");
 var _login = require("./login");
 var _mapbox = require("./mapbox");
+var _updateSettings = require("./updateSettings");
 /* eslint-disable */
 
 // DOM Elements
-const loginForm = document.querySelector('.form');
+const loginForm = document.querySelector('.logi-form');
 const logoutBtn = document.querySelector('.nav__el--logout');
+const userDataForm = document.querySelector('.form-user-data');
+const userPasswordForm = document.querySelector('.form-user-password');
 const mapBox = document.getElementById('map');
 
 // DOM ELEMENTS .form if found in the document
@@ -13162,14 +13165,47 @@ if (logoutBtn) {
     (0, _login.logout)();
   });
 }
-
 // DOM ELEMENTS .map if found in the document
 if (mapBox) {
   const locations = JSON.parse(mapBox.dataset.locations);
   (0, _mapbox.displayMap)(locations);
 }
 
-},{"./login":363,"./mapbox":364,"@babel/polyfill":1}],363:[function(require,module,exports){
+// DOM ELEMENTS .form-user-data if found in the document
+if (userDataForm) {
+  userDataForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    document.querySelector('.btn--save-settings').textContent = 'Updating...';
+    const form = new FormData();
+    form.append('name', document.getElementById('name').value);
+    form.append('email', document.getElementById('email').value);
+    form.append('photo', document.getElementById('photo').files[0]);
+    // const name = document.getElementById('name').value;
+    // const email = document.getElementById('email').value;
+
+    await (0, _updateSettings.updateSettings)(form, 'data');
+    document.querySelector('.btn--save-settings').textContent = 'Save settings';
+  });
+}
+
+// DOM ELEMENTS .form-user-password if found in the document
+if (userPasswordForm) {
+  userPasswordForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    document.querySelector('.btn--save-password').textContent = 'Updating...';
+    const passwordCurrent = document.getElementById('password-current').value;
+    const password = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('password-confirm').value;
+    await (0, _updateSettings.updateSettings)({
+      passwordCurrent,
+      password,
+      passwordConfirm
+    }, 'password');
+    document.querySelector('.btn--save-password').textContent = 'Save password';
+  });
+}
+
+},{"./login":363,"./mapbox":364,"./updateSettings":365,"@babel/polyfill":1}],363:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -13268,4 +13304,34 @@ const displayMap = locations => {
 };
 exports.displayMap = displayMap;
 
-},{}]},{},[362]);
+},{}],365:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.updateSettings = void 0;
+var _axios = _interopRequireDefault(require("axios"));
+var _alerts = require("./alerts");
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+/* eslint-disable */
+
+// type is either 'password' or 'data'
+const updateSettings = async (data, type) => {
+  try {
+    const url = type === 'password' ? '/api/v1/users/update-my-password' : '/api/v1/users/update-me';
+    const res = await (0, _axios.default)({
+      method: 'PATCH',
+      url,
+      data
+    });
+    if (res.data.status === 'success') {
+      (0, _alerts.showAlert)('success', `${type.toUpperCase()} updated successfully!`);
+    }
+  } catch (err) {
+    (0, _alerts.showAlert)('error', err.response.data.message);
+  }
+};
+exports.updateSettings = updateSettings;
+
+},{"./alerts":361,"axios":3}]},{},[362]);
