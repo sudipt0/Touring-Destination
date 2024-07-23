@@ -22,10 +22,12 @@ const mapBox = document.getElementById('map');
 if (loginForm) {
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    document.querySelector('.btn--login').textContent = 'Please wait...';
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     //   console.log(email, password);
     await login(email, password);
+    document.querySelector('.btn--login').textContent = 'Login';
   });
 }
 //logout
