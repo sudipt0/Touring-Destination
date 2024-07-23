@@ -17,7 +17,7 @@ class APIFeature {
 
     /* If env is development then console log */
     if (process.env.NODE_ENV === 'development') {
-      console.log('query string from apiFeature', JSON.parse(queryStr));
+      // console.log('query string from apiFeature', JSON.parse(queryStr));
     }
 
     this.query = this.query.find(JSON.parse(queryStr));

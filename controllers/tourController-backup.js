@@ -6,7 +6,7 @@ const tours = JSON.parse(
 
 /* Middleware export */
 exports.checkID = (req, res, next, val) => {
-  console.log(`Tour id is: ${val}`);
+  // console.log(`Tour id is: ${val}`);
 
   const id = req.params.id * 1;
   const tour = tours.find((el) => el.id === id);
