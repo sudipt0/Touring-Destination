@@ -1,15 +1,20 @@
 /* eslint-disable */
 import '@babel/polyfill';
 
-import { login, logout } from './login';
+import { login, logout, signup, forgotPassword, resetPassword } from './login';
 import { displayMap } from './mapbox';
 import { updateSettings } from './updateSettings';
 
 // DOM Elements
-const loginForm = document.querySelector('.logi-form');
+const loginForm = document.querySelector('.login_form_action');
 const logoutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
+const signupForm = document.querySelector('.signup_form_action');
+const forgetPasswordForm = document.querySelector(
+  '.forgot_password_form_action',
+);
+const resetPasswordForm = document.querySelector('.reset_password_form_action');
 
 const mapBox = document.getElementById('map');
 
@@ -70,5 +75,56 @@ if (userPasswordForm) {
     );
 
     document.querySelector('.btn--save-password').textContent = 'Save password';
+  });
+}
+
+// DOM ELEMENTS .signup-form if found in the document
+if (signupForm) {
+  signupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    document.querySelector('.btn--signup').textContent = 'Signing up...';
+
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('password-confirm').value;
+    await signup(name, email, password, passwordConfirm);
+
+    document.querySelector('.btn--signup').textContent = 'Sign up';
+  });
+}
+
+// DOM ELEMENTS .forgot-password-form if found in the document
+if (forgetPasswordForm) {
+  forgetPasswordForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    document.querySelector('.btn--forgot-password').textContent =
+      'Please wait...';
+
+    const email = document.getElementById('email').value;
+    await forgotPassword(email).then(() => {
+      // reset the email
+      document.getElementById('email').value = '';
+    });
+
+    document.querySelector('.btn--forgot-password').textContent = 'Submit';
+  });
+}
+
+// DOM ELEMENTS .reset-password-form if found in the document
+if (resetPasswordForm) {
+  resetPasswordForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    document.querySelector('.btn--reset-password').textContent =
+      'Please wait...';
+
+    const password = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('password-confirm').value;
+    const token = document.getElementById('token').value;
+
+    await resetPassword(password, passwordConfirm, token);
+
+    document.querySelector('.btn--reset-password').textContent =
+      'Reset Password';
   });
 }

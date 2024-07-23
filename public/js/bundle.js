@@ -13143,10 +13143,13 @@ var _updateSettings = require("./updateSettings");
 /* eslint-disable */
 
 // DOM Elements
-const loginForm = document.querySelector('.logi-form');
+const loginForm = document.querySelector('.login_form_action');
 const logoutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
+const signupForm = document.querySelector('.signup_form_action');
+const forgetPasswordForm = document.querySelector('.forgot_password_form_action');
+const resetPasswordForm = document.querySelector('.reset_password_form_action');
 const mapBox = document.getElementById('map');
 
 // DOM ELEMENTS .form if found in the document
@@ -13205,13 +13208,59 @@ if (userPasswordForm) {
   });
 }
 
+// DOM ELEMENTS .signup-form if found in the document
+if (signupForm) {
+  signupForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    document.querySelector('.btn--signup').textContent = 'Signing up...';
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('password-confirm').value;
+    await (0, _login.signup)(name, email, password, passwordConfirm);
+    document.querySelector('.btn--signup').textContent = 'Sign up';
+  });
+}
+
+// DOM ELEMENTS .forgot-password-form if found in the document
+if (forgetPasswordForm) {
+  forgetPasswordForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    document.querySelector('.btn--forgot-password').textContent = 'Please wait...';
+    const email = document.getElementById('email').value;
+    await (0, _login.forgotPassword)(email).then(() => {
+      // reset the email
+      document.getElementById('email').value = '';
+    });
+    document.querySelector('.btn--forgot-password').textContent = 'Submit';
+  });
+}
+
+// DOM ELEMENTS .reset-password-form if found in the document
+if (resetPasswordForm) {
+  resetPasswordForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    document.querySelector('.btn--reset-password').textContent = 'Please wait...';
+    const password = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('password-confirm').value;
+    const token = document.getElementById('token').value;
+    await (0, _login.resetPassword)(password, passwordConfirm, token).then(() => {
+      // reset the email
+      document.getElementById('password').value = '';
+      document.getElementById('password-confirm').value = '';
+      document.getElementById('token').value = '';
+    });
+    document.querySelector('.btn--reset-password').textContent = 'Reset Password';
+  });
+}
+
 },{"./login":363,"./mapbox":364,"./updateSettings":365,"@babel/polyfill":1}],363:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.logout = exports.login = void 0;
+exports.signup = exports.resetPassword = exports.logout = exports.login = exports.forgotPassword = void 0;
 var _axios = _interopRequireDefault(require("axios"));
 var _alerts = require("./alerts");
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
@@ -13252,6 +13301,68 @@ const logout = async () => {
   }
 };
 exports.logout = logout;
+const signup = async (name, email, password, passwordConfirm) => {
+  // console
+  try {
+    const res = await (0, _axios.default)({
+      method: 'POST',
+      url: '/api/v1/users/signup',
+      data: {
+        name,
+        email,
+        password,
+        passwordConfirm
+      }
+    });
+    if (res.data.status === 'success') {
+      (0, _alerts.showAlert)('success', 'Account created successfully!');
+      window.setTimeout(() => {
+        location.assign('/');
+      }, 1500);
+    }
+  } catch (err) {
+    (0, _alerts.showAlert)('error', err.response.data.message);
+  }
+};
+exports.signup = signup;
+const forgotPassword = async email => {
+  try {
+    const res = await (0, _axios.default)({
+      method: 'POST',
+      url: '/api/v1/users/forgot-password',
+      data: {
+        email
+      }
+    });
+    if (res.data.status === 'success') {
+      (0, _alerts.showAlert)('success', 'Token sent to email!');
+    }
+  } catch (err) {
+    (0, _alerts.showAlert)('error', err.response.data.message);
+  }
+};
+exports.forgotPassword = forgotPassword;
+const resetPassword = async (password, passwordConfirm, token) => {
+  try {
+    const res = await (0, _axios.default)({
+      method: 'PATCH',
+      url: `/api/v1/users/reset-password/${token}`,
+      data: {
+        password,
+        passwordConfirm
+      }
+    });
+    if (res.data.status === 'success') {
+      (0, _alerts.showAlert)('success', 'Password reset successfully!');
+      window.setTimeout(() => {
+        location.assign('/');
+      }, 1500);
+    }
+  } catch (err) {
+    (0, _alerts.showAlert)('error', err.response.data.message);
+  }
+};
+exports.resetPassword = resetPassword;
 
 },{"./alerts":361,"axios":3}],364:[function(require,module,exports){
 "use strict";

@@ -1,6 +1,7 @@
 const Tour = require('../models/tourModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const { token } = require('morgan');
 
 exports.getOverview = catchAsync(async (req, res) => {
   // 1) Get tour data from collection
@@ -58,5 +59,41 @@ exports.getAccount = (req, res) => {
     .status(200)
     .render('account/me', {
       title: 'Your account',
+    });
+};
+
+exports.signup = (req, res) => {
+  res
+    .setHeader(
+      'Content-Security-Policy',
+      "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; ",
+    )
+    .status(200)
+    .render('signup', {
+      title: 'Create your account',
+    });
+};
+
+exports.forgotPassword = (req, res) => {
+  res
+    .setHeader(
+      'Content-Security-Policy',
+      "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; ",
+    )
+    .status(200)
+    .render('forgotPassword', {
+      title: 'Forgot your password?',
+    });
+};
+exports.resetPassword = (req, res) => {
+  res
+    .setHeader(
+      'Content-Security-Policy',
+      "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; ",
+    )
+    .status(200)
+    .render('resetPassword', {
+      title: 'Reset your password',
+      token: req.params.token,
     });
 };

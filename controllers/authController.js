@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
-const sendEmail = require('../utils/email');
+const Email = require('../utils/email');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -47,6 +47,10 @@ exports.signup = catchAsync(async (req, res) => {
     passwordConfirm: req.body.passwordConfirm,
     role: req.body.role,
   });
+  // Send welcome email
+  const url = `${req.protocol}://${req.get('host')}/account`;
+  await new Email(newUser, url).sendWelcome();
+
   createSendToken(newUser, 201, res);
 
   /* const token = signToken(newUser._id);
@@ -204,14 +208,16 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   // 3) Send it to user's email
   const resetURL = `${req.protocol}://${req.get(
     'host',
-  )}/api/v1/users/reset-password/${resetToken}`;
-  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
+  )}/reset-password/${resetToken}`;
+
+  // const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
   try {
-    await sendEmail({
+    await new Email(user, resetURL).sendPasswordReset();
+    /* await sendEmail({
       email: user.email,
       subject: 'Your password reset token (valid for 10 min)',
       message: message,
-    });
+    }); */
   } catch (err) {
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
