@@ -13244,12 +13244,7 @@ if (resetPasswordForm) {
     const password = document.getElementById('password').value;
     const passwordConfirm = document.getElementById('password-confirm').value;
     const token = document.getElementById('token').value;
-    await (0, _login.resetPassword)(password, passwordConfirm, token).then(() => {
-      // reset the email
-      document.getElementById('password').value = '';
-      document.getElementById('password-confirm').value = '';
-      document.getElementById('token').value = '';
-    });
+    await (0, _login.resetPassword)(password, passwordConfirm, token);
     document.querySelector('.btn--reset-password').textContent = 'Reset Password';
   });
 }
